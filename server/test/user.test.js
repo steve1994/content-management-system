@@ -66,4 +66,24 @@ describe('users',function () {
             })
         })
     })
+
+    it('seharusnya dapat melakukan destroy terhadap token user', function(done) {
+        chai.request(server).
+        post('/api/users/register').
+        send({email:'steve.harnadi@gmail.com',password:'1234',retypepassword:'1234'}).
+        end(function (err,res) {
+            let token = res.body.token;
+            chai.request(server).
+            get('api/users/destroy').
+            set('Authorization',token).
+            end(function (err,res) {
+                console.log(res);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.have.property('logout');
+                res.body.logout.should.equal(true);
+                done();
+            })
+        })
+    })
 })
