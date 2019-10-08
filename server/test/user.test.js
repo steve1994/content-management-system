@@ -47,23 +47,23 @@ describe('users',function () {
         })
     })
 
-    // it('seharusnya dapat melakukan pengecekan token user yang sedang login', function (done) {
-    //     chai.request(server).
-    //     post('/api/users/register').
-    //     send({email:'steve.harnadi@gmail.com',password:'1234',retypepassword:'1234'}).
-    //     end(function (err,res) {
-    //         let token = res.body.token;
-    //         chai.request(server).
-    //         get('api/users/check').
-    //         set('Authorization',token).
-    //         end(function (err,res) {
-    //             console.log(res);
-    //             res.should.have.status(200);
-    //             res.should.be.json;
-    //             res.body.should.have.property('valid');
-    //             res.body.valid.should.equal(true);
-    //             done();
-    //         })
-    //     })
-    // })
+    it('seharusnya dapat melakukan pengecekan token user yang sedang login', function (done) {
+        chai.request(server).
+        post('/api/users/register').
+        send({email:'steve.harnadi@gmail.com',password:'1234',retypepassword:'1234'}).
+        end(function (err,res) {
+            let token = res.body.token;
+            chai.request(server).
+            get('api/users/check').
+            set('Authorization',token).
+            end(function (err,res) {
+                console.log(res);
+                res.should.have.status(200);
+                res.should.be.json;
+                res.body.should.have.property('valid');
+                res.body.valid.should.equal(true);
+                done();
+            })
+        })
+    })
 })
