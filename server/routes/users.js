@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 const User = require('../models/user');
 var jwt = require('jsonwebtoken');
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 router.post('/register', function(req, res) {
     let email = req.body.email;
@@ -15,9 +16,11 @@ router.post('/register', function(req, res) {
                 res.status(400).json({'error':'email is already registered'});
             } else {
                 let token = jwt.sign({'email':email}, 'persib1994secret');
-                const userNew = new User({'email':email,'password':password,'token':token});
-                userNew.save(()=>{
-                    res.status(200).json({data:{'email':email},'token':token});
+                bcrypt.hash(password, saltRounds, function (err,hash) {
+                    const userNew = new User({'email':email,'password':hash,'token':token});
+                    userNew.save(()=>{
+                        res.status(200).json({data:{'email':email},'token':token});
+                    });
                 });
             }
         })
@@ -34,18 +37,20 @@ router.post('/login',function (req,res) {
             res.status(400).json({error:err});
         } else {
             if (user) {
-                if (user.password == password) {
-                    let token = jwt.sign({'email':email}, 'persib1994secret');
-                    User.findOneAndUpdate({'email':email},{'token':token},function (err,response) {
-                        if (err) {
-                            res.status(400).json({error:err});
-                        } else {
-                            res.status(200).json({data:{'email':email},'token':token});
-                        }
-                    })
-                } else {
-                    res.status(400).json({'error':'email/password not correct'});
-                }
+                bcrypt.compare(password, user.password, function (err,valid) {
+                    if (valid) {
+                        let token = jwt.sign({'email':email}, 'persib1994secret');
+                        User.findOneAndUpdate({'email':email},{'token':token},function (err,response) {
+                            if (err) {
+                                res.status(400).json({error:err});
+                            } else {
+                                res.status(200).json({data:{'email':email},'token':token});
+                            }
+                        })
+                    } else {
+                        res.status(400).json({'error':'email/password not correct'});
+                    }
+                })
             } else {
                 res.status(400).json({'error':'email/password not correct'});
             }
