@@ -54,10 +54,9 @@ describe('users',function () {
         end(function (err,res) {
             let token = res.body.token;
             chai.request(server).
-            get('api/users/check').
+            get('/api/users/check').
             set('Authorization',token).
             end(function (err,res) {
-                console.log(res);
                 res.should.have.status(200);
                 res.should.be.json;
                 res.body.should.have.property('valid');
@@ -74,10 +73,9 @@ describe('users',function () {
         end(function (err,res) {
             let token = res.body.token;
             chai.request(server).
-            get('api/users/destroy').
+            get('/api/users/destroy').
             set('Authorization',token).
             end(function (err,res) {
-                console.log(res);
                 res.should.have.status(200);
                 res.should.be.json;
                 res.body.should.have.property('logout');
