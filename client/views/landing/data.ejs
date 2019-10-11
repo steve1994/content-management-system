@@ -45,49 +45,52 @@
 
   <!-- Page Content -->
   <div class="container">
+    <div class="form-group row">
+      <div class="form-group col-md-5">
+        <button class="btn btn-primary" id="add">+ add</button>
+      </div>
+    </div>
+    <form id="add_form" method="post" style="display:none;">
       <div class="form-group row">
-          <div class="form-group col-md-5">
-            <button class="btn btn-primary" id="add">+ add</button>
-          </div>
+        <input type="hidden" id="hidden_id">
+        <div class="form-group col-md-5">
+          <label for="letter">Letter</label>
+          <input type="text" class="form-control" id="letter" placeholder="Letter">
+        </div>
+        <div class="form-group col-md-5">
+          <label for="frequency">Frequency</label>
+          <input type="text" class="form-control" id="frequency" placeholder="Frequency">
+        </div>
+        <div class="form-group col-md-2">
+          <button type="submit" class="btn btn-primary">save</button>
+        </div>
       </div>
-      <div class="form-group row" style="display:none;" id="add_form">
-          <div class="form-group col-md-5">
-              <label for="letter">Letter</label>
-              <input type="text" class="form-control" id="letter" placeholder="Letter">
-          </div>
-          <div class="form-group col-md-5">
-              <label for="frequency">Frequency</label>
-              <input type="text" class="form-control" id="frequency" placeholder="Frequency">
-          </div>
-          <div class="form-group col-md-2">
-              <button id="save" class="btn btn-primary">save</button>
-          </div>
+    </form>
+    <div class="form-row">
+      <h2>Search</h2>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="letter">Letter</label>
+        <input type="text" class="form-control" id="letter_search" placeholder="Letter">
       </div>
-      <div class="form-row">
-          <h2>Search</h2>
+      <div class="form-group col-md-6">
+        <label for="frequency">Frequency</label>
+        <input type="text" class="form-control" id="frequency_search" placeholder="Frequency">
       </div>
-      <div class="form-row">
-          <div class="form-group col-md-6">
-              <label for="letter">Letter</label>
-              <input type="text" class="form-control" id="letter" placeholder="Letter">
-          </div>
-          <div class="form-group col-md-6">
-              <label for="frequency">Frequency</label>
-              <input type="text" class="form-control" id="frequency" placeholder="Frequency">
-          </div>
-      </div>
-      <table class="table">
-          <thead class="thead-dark">
-              <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Letter</th>
-                  <th scope="col">Frequency</th>
-                  <th scope="col">Action</th>
-              </tr>
-          </thead>
-          <tbody>
-          </tbody>
-      </table>
+    </div>
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Letter</th>
+          <th scope="col">Frequency</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
   </div>
 
   <!-- Bootstrap core JavaScript -->
@@ -96,53 +99,138 @@
   <script src="/javascripts/jquery-3.4.1.min.js"></script>
 
   <script type="text/javascript">
-      $(document).ready(function() {
-          $('#add').click(function() {
-              $('#add_form').show();
-          });
-          loadData();
-          $('#save').click(function() {
-              addData();
-              $('#add_form').hide();
-          })
+  $(document).ready(function() {
+    $('#add').click(function() {
+        $('#hidden_id').val('');
+        $('#add_form').show();
+    });
+    loadData();
+    $('#add_form').submit(function (event) {
+        event.preventDefault();
+        if ($('#hidden_id').val()) {
+            editData($('#hidden_id').val());
+        } else {
+            addData();
+        }
+        $('#add_form').hide();
+    })
+    $('#update').click(function() {
+        $('#add_form').show();
+        let idData = $('#update').attr('data-id');
+        let counterData = $('#update').attr('data-counter');
+
+        let selectorDataLetter = `table tbody tr:nth-child(${counterData}) td:nth-child(2)`;
+        let selectorDataFrequency = `table tbody tr:nth-child(${counterData}) td:nth-child(3)`;
+
+        $('#letter').val($(selectorDataLetter).val());
+        $('#frequency').val($(selectorDataFrequency).val());
+        $('#hidden_id').val(idData);
+    });
+    $('#delete').click(function () {
+        let confirmationDelete = confirm('Are you sure want to delete this data?');
+        if (confirmationDelete) {
+            let idData = $('#delete').attr('data-id');
+            deleteData(idData);
+        }
+    })
+    $('#letter_search','#frequency_search').keyup(function () {
+        let letterSearch = $('#letter_search').val();
+        let frequencySearch = $('#frequency_search').val();
+        let objectSearch = {letter:letterSearch,frequency:frequencySearch};
+        if (!letterSearch) {
+            delete objectSearch['letter'];
+        }
+        if (!frequencySearch) {
+            delete objectSearch['frequency'];
+        }
+        searchData(objectSearch);
+    })
+  })
+
+  const apiUrl = "http://localhost:3000/api/data/";
+
+  const loadData = () => {
+    $.ajax({
+      method:"GET",
+      url:apiUrl,
+      dataType:"json"
+    }).done(function (data) {
+      let html = '';
+      data.forEach((item,index) => {
+        html += `<tr>
+          <td scope="row">${index+1}</td>
+          <td>${item.letter}</td>
+          <td>${item.frequency}</td>
+          <td>
+          <a class="btn btn-warning" id="update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
+          <a class="btn btn-danger" id="delete" data-id=${item._id}>Delete</a>
+          </td>
+        </tr>`;
       })
+      $('table tbody').html(html);
+    })
+  }
 
-      const apiUrl = "http://localhost:3000/api/data";
-      const loadData = () => {
-          $.ajax({
-              method:"GET",
-              url:apiUrl,
-              dataType:"json"
-          }).done(function (data) {
-              let html = '';
-              data.forEach((item,index) => {
-                  html += `<tr>
-                      <th scope="row">${index+1}</th>
-                      <td>${item.letter}</td>
-                      <td>${item.frequency}</td>
-                      <td>
-                          <a class="btn btn-warning" href="#">Update</a>&nbsp;
-                          <a class="btn btn-danger" href="#">Delete</a>
-                      </td>
-                  </tr>`;
-              })
-              $('table tbody').html(html);
-          })
-      }
+  const addData = () => {
+    $.ajax({
+      method:"POST",
+      url:apiUrl,
+      data: {
+        letter:$('#letter').val(),
+        frequency:$('#frequency').val()
+      },
+      dataType: "json"
+    }).done(function (data) {
+      loadData();
+    })
+  }
 
-      const addData = () => {
-          $.ajax({
-              method:"POST",
-              url:apiUrl,
-              data: {
-                  letter:$('#letter').val();
-                  frequency:$('#frequency').val();
-              },
-              dataType: "json"
-          }).done(function (data) {
-              loadData();
-          })
-      }
+  const editData = (hidden_id) => {
+    $.ajax({
+      method:"PUT",
+      url:apiUrl+hidden_id,
+      data: {
+        letter:$('#letter').val(),
+        frequency:$('#frequency').val()
+      },
+      dataType: "json"
+    }).done(function (data) {
+      loadData();
+    })
+  }
+
+  const deleteData = (hidden_id) => {
+    $.ajax({
+      method:"DELETE",
+      url:apiUrl+hidden_id,
+      dataType:"json"
+    }).done(function (data) {
+      loadData();
+    })
+  }
+
+  const searchData = (objSearch) => {
+    $.ajax({
+      method:"POST",
+      url:apiUrl+'search',
+      data:objSearch,
+      dataType:"json"
+    }).done(function (data) {
+      let html = "";
+      data.forEach((item,index) => {
+        html += `<tr>
+          <td scope="row">${index+1}</td>
+          <td>${item.letter}</td>
+          <td>${item.frequency}</td>
+          <td>
+          <a class="btn btn-warning" id="update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
+          <a class="btn btn-danger" id="delete" data-id=${item._id}>Delete</a>
+          </td>
+        </tr>`;
+      })
+      $('table tbody').html(html);
+    })
+  }
 
   </script>
 
