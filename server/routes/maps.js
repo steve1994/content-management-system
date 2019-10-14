@@ -67,6 +67,9 @@ router.delete('/:id',function (req,res) {
 
 router.post('/search',function (req, res) {
     let filterSearch = {title:req.body.title};
+    if (!req.body.title) {
+        delete filterSearch['title'];
+    }
     Map.find(filterSearch, function(err, response) {
         if (err) {
             res.status(400).json({'error':err});

@@ -27,16 +27,16 @@
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">Home</a>
+            <a class="nav-link" href="/landing">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Data</a>
+            <a class="nav-link" href="/landing/data">Data</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Data Date</a>
+            <a class="nav-link" href="/landing/datadate">Data Date</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Maps</a>
+            <a class="nav-link" href="/landing/map">Maps</a>
           </li>
         </ul>
       </div>
@@ -45,21 +45,208 @@
 
   <!-- Page Content -->
   <div class="container">
-    <div class="row">
-      <div class="col-lg-12 text-center">
-        <h1 class="mt-5">A Bootstrap 4 Starter Template</h1>
-        <p class="lead">Complete with pre-defined file paths and responsive navigation!</p>
-        <ul class="list-unstyled">
-          <li>Bootstrap 4.3.1</li>
-          <li>jQuery 3.4.1</li>
-        </ul>
+    <div class="form-group row">
+      <div class="form-group col-md-5">
+        <button class="btn btn-primary" id="add">+ add</button>
       </div>
     </div>
+    <form id="add_form" method="post" style="display:none;">
+      <div class="form-group row">
+        <input type="hidden" id="hidden_id">
+        <div class="form-group col-md-3">
+          <label for="title">Title</label>
+          <input type="text" class="form-control" id="title" placeholder="Title">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="latitude">Latitude</label>
+          <input type="text" class="form-control" id="latitude" placeholder="Latitude">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="longitude">Longitude</label>
+          <input type="text" class="form-control" id="longitude" placeholder="Longitude">
+        </div>
+        <div class="form-group col-md-3">
+          <button type="submit" class="btn btn-primary">save</button>
+        </div>
+      </div>
+    </form>
+    <div class="form-row">
+      <h2>Search</h2>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="title_search">Title</label>
+        <input type="text" class="form-control" id="title_search" placeholder="Title">
+      </div>
+    </div>
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Title</th>
+          <th scope="col">Latitude</th>
+          <th scope="col">Longitude</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
   </div>
 
   <!-- Bootstrap core JavaScript -->
   <script src="/vendor/jquery/jquery.slim.min.js"></script>
   <script src="/vendor/bootstrap/js_2/bootstrap.bundle.min.js"></script>
+  <script src="/javascripts/jquery-3.4.1.min.js"></script>
+
+  <script type="text/javascript">
+  $(document).ready(function() {
+    $('#add').click(function() {
+        $('#hidden_id').val('');
+        $('#add_form').show();
+    });
+    loadData();
+    $('#add_form').submit(function (event) {
+        event.preventDefault();
+        if ($('#hidden_id').val()) {
+            editData($('#hidden_id').val());
+        } else {
+            addData();
+        }
+        $('#add_form').hide();
+    })
+    $('#title_search').keyup(function () {
+        let titleSearch = $('#title_search').val();
+        let objectSearch = {title:titleSearch};
+        if (!titleSearch) {
+            delete objectSearch['title'];
+        }
+        searchData(objectSearch);
+    })
+  })
+
+  const updateAjax = () => {
+    $('.btn-update').click(function() {
+        $('#add_form').show();
+        let idData = $(this).attr('data-id');
+        let counterData = $(this).attr('data-counter');
+
+        let selectorDataTitle = `table tbody tr:nth-child(${counterData}) td:nth-child(2)`;
+        let selectorDataLatitude = `table tbody tr:nth-child(${counterData}) td:nth-child(3)`;
+        let selectorDataLongitude = `table tbody tr:nth-child(${counterData}) td:nth-child(4)`;
+
+        $('#title').val($(selectorDataTitle).text());
+        $('#latitude').val($(selectorDataLatitude).text());
+        $('#longitude').val($(selectorDataLongitude).text());
+        $('#hidden_id').val(idData);
+    });
+  }
+
+  const deleteAjax = () => {
+    $('.btn-delete').click(function () {
+        $('#add_form').hide();
+        let confirmationDelete = confirm('Are you sure want to delete this data?');
+        if (confirmationDelete) {
+            let idData = $(this).attr('data-id');
+            deleteData(idData);
+        }
+    })
+  }
+
+  const apiUrl = "http://localhost:3000/api/map/";
+
+  const loadData = () => {
+    $.ajax({
+      method:"GET",
+      url:apiUrl,
+      dataType:"json"
+    }).done(function (data) {
+      let html = '';
+      data.forEach((item,index) => {
+        html += `<tr>
+          <td scope="row">${index+1}</td>
+          <td>${item.title}</td>
+          <td>${item.lat}</td>
+          <td>${item.lng}</td>
+          <td>
+          <a class="btn btn-warning btn-update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
+          <a class="btn btn-danger btn-delete" data-id=${item._id}>Delete</a>
+          </td>
+        </tr>`;
+      })
+      $('table tbody').html(html);
+      updateAjax();
+      deleteAjax();
+    })
+  }
+
+  const addData = () => {
+    $.ajax({
+      method:"POST",
+      url:apiUrl,
+      data: {
+        title:$('#title').val(),
+        lat:$('#latitude').val(),
+        lng:$('#longitude').val()
+      },
+      dataType: "json"
+    }).done(function (data) {
+      loadData();
+    })
+  }
+
+  const editData = (hidden_id) => {
+    $.ajax({
+      method:"PUT",
+      url:apiUrl+hidden_id,
+      data: {
+        title:$('#title').val(),
+        lat:$('#latitude').val(),
+        lng:$('#longitude').val()
+      },
+      dataType: "json"
+    }).done(function (data) {
+      loadData();
+    })
+  }
+
+  const deleteData = (hidden_id) => {
+    $.ajax({
+      method:"DELETE",
+      url:apiUrl+hidden_id,
+      dataType:"json"
+    }).done(function (data) {
+      loadData();
+    })
+  }
+
+  const searchData = (objSearch) => {
+    $.ajax({
+      method:"POST",
+      url:apiUrl+'search',
+      data:objSearch,
+      dataType:"json"
+    }).done(function (data) {
+      let html = "";
+      data.forEach((item,index) => {
+        html += `<tr>
+          <td scope="row">${index+1}</td>
+          <td>${item.title}</td>
+          <td>${item.lat}</td>
+          <td>${item.lng}</td>
+          <td>
+          <a class="btn btn-warning btn-update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
+          <a class="btn btn-danger btn-delete" data-id=${item._id}>Delete</a>
+          </td>
+        </tr>`;
+      })
+      $('table tbody').html(html);
+      updateAjax();
+      deleteAjax();
+    })
+  }
+
+  </script>
 
 </body>
 
