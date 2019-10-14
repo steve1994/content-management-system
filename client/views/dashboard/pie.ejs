@@ -26,28 +26,14 @@
 	<link rel="stylesheet" type="text/css" href="/css/util.css">
 	<link rel="stylesheet" type="text/css" href="/css/main.css">
 	<!--===============================================================================================-->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
 </head>
 <body>
 
 	<div class="limiter">
-		<a href="/line" class="btn btn-block btn-danger">
-			<button>line</button>
-		</a>
-		<a href="/pie" class="btn btn-block btn-warning">
-			<button>pie</button>
-		</a>
-		<a href="/bar" class="btn btn-block btn-primary">
-			<button>bar</button>
-		</a>
-		<a href='/map' class="btn btn-block btn-success">
-			<button>map</button>
-		</a>
-		<a href="/login" class="btn btn-block btn-info">
-			<button>Admin Panel</button>
-		</a>
+		<div id="chart1"></div>
 	</div>
-
-
 
 	<!--===============================================================================================-->
 	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
@@ -65,6 +51,46 @@
 	<script src="/vendor/countdowntime/countdowntime.js"></script>
 	<!--===============================================================================================-->
 	<script src="/javascripts/main.js"></script>
+
+	<script type="text/javascript">
+
+			$(document).ready(function() {
+					loadData();
+			})
+
+			const apiUrl = "http://localhost:3000/api/data/";
+			const loadData = () => {
+					$.ajax({
+							method:"GET",
+							url:apiUrl,
+							dataType:"json"
+					}).done(function(data) {
+							let dataCharts = [];
+							data.forEach((item,index) => {
+									dataCharts.push([item.letter,item.frequency]);
+							});
+							loadCharts(dataCharts);
+					})
+			}
+
+			const loadCharts = (dataCharts) => {
+				google.charts.load('current', {'packages':['corechart']});
+				google.charts.setOnLoadCallback(drawChart);
+
+				function drawChart() {
+					var data = new google.visualization.DataTable();
+					data.addColumn('string', 'Topping');
+					data.addColumn('number', 'Slices');
+					data.addRows(dataCharts);
+					var options = {'title':'Data PieChart',
+												 'width':1000,
+												 'height':1000};
+					var chart = new google.visualization.PieChart(document.getElementById('chart1'));
+					chart.draw(data, options);
+				}
+			}
+
+	</script>
 
 </body>
 </html>

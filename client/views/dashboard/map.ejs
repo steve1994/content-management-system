@@ -26,29 +26,31 @@
 	<link rel="stylesheet" type="text/css" href="/css/util.css">
 	<link rel="stylesheet" type="text/css" href="/css/main.css">
 	<!--===============================================================================================-->
+	<style>
+      #map {
+        height: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
 </head>
 <body>
 
-	<div class="limiter">
-		<a href="/line" class="btn btn-block btn-danger">
-			<button>line</button>
-		</a>
-		<a href="/pie" class="btn btn-block btn-warning">
-			<button>pie</button>
-		</a>
-		<a href="/bar" class="btn btn-block btn-primary">
-			<button>bar</button>
-		</a>
-		<a href='/map' class="btn btn-block btn-success">
-			<button>map</button>
-		</a>
-		<a href="/login" class="btn btn-block btn-info">
-			<button>Admin Panel</button>
-		</a>
-	</div>
+	<div id="map"></div>
+	<script>
+		var map;
+		function initMap() {
+			map = new google.maps.Map(document.getElementById('map'), {
+				center: {lat: -34.397, lng: 150.644},
+				zoom: 8
+			});
+		}
+	</script>
 
-
-
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCO08MKwMMTPayVhcd1FAvUo5IRCnXgjQ4&callback=initMap" async defer></script>
 	<!--===============================================================================================-->
 	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
 	<!--===============================================================================================-->

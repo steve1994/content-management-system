@@ -15,5 +15,8 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "nodemon": "^1.19.3"
+  },
+  "devDependencies": {
+    "google-charts": "^2.0.0"
   }
 }
