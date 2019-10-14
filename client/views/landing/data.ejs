@@ -114,26 +114,7 @@
         }
         $('#add_form').hide();
     })
-    $('#update').click(function() {
-        $('#add_form').show();
-        let idData = $('#update').attr('data-id');
-        let counterData = $('#update').attr('data-counter');
-
-        let selectorDataLetter = `table tbody tr:nth-child(${counterData}) td:nth-child(2)`;
-        let selectorDataFrequency = `table tbody tr:nth-child(${counterData}) td:nth-child(3)`;
-
-        $('#letter').val($(selectorDataLetter).val());
-        $('#frequency').val($(selectorDataFrequency).val());
-        $('#hidden_id').val(idData);
-    });
-    $('#delete').click(function () {
-        let confirmationDelete = confirm('Are you sure want to delete this data?');
-        if (confirmationDelete) {
-            let idData = $('#delete').attr('data-id');
-            deleteData(idData);
-        }
-    })
-    $('#letter_search','#frequency_search').keyup(function () {
+    $('#letter_search, #frequency_search').keyup(function () {
         let letterSearch = $('#letter_search').val();
         let frequencySearch = $('#frequency_search').val();
         let objectSearch = {letter:letterSearch,frequency:frequencySearch};
@@ -146,6 +127,32 @@
         searchData(objectSearch);
     })
   })
+
+  const updateAjax = () => {
+    $('.btn-update').click(function() {
+        $('#add_form').show();
+        let idData = $(this).attr('data-id');
+        let counterData = $(this).attr('data-counter');
+
+        let selectorDataLetter = `table tbody tr:nth-child(${counterData}) td:nth-child(2)`;
+        let selectorDataFrequency = `table tbody tr:nth-child(${counterData}) td:nth-child(3)`;
+
+        $('#letter').val($(selectorDataLetter).text());
+        $('#frequency').val($(selectorDataFrequency).text());
+        $('#hidden_id').val(idData);
+    });
+  }
+
+  const deleteAjax = () => {
+    $('.btn-delete').click(function () {
+        $('#add_form').hide();
+        let confirmationDelete = confirm('Are you sure want to delete this data?');
+        if (confirmationDelete) {
+            let idData = $(this).attr('data-id');
+            deleteData(idData);
+        }
+    })
+  }
 
   const apiUrl = "http://localhost:3000/api/data/";
 
@@ -162,12 +169,14 @@
           <td>${item.letter}</td>
           <td>${item.frequency}</td>
           <td>
-          <a class="btn btn-warning" id="update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
-          <a class="btn btn-danger" id="delete" data-id=${item._id}>Delete</a>
+          <a class="btn btn-warning btn-update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
+          <a class="btn btn-danger btn-delete" data-id=${item._id}>Delete</a>
           </td>
         </tr>`;
       })
       $('table tbody').html(html);
+      updateAjax();
+      deleteAjax();
     })
   }
 
@@ -223,12 +232,14 @@
           <td>${item.letter}</td>
           <td>${item.frequency}</td>
           <td>
-          <a class="btn btn-warning" id="update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
-          <a class="btn btn-danger" id="delete" data-id=${item._id}>Delete</a>
+          <a class="btn btn-warning btn-update" data-id=${item._id} data-counter=${index+1}>Update</a>&nbsp;
+          <a class="btn btn-danger btn-delete" data-id=${item._id}>Delete</a>
           </td>
         </tr>`;
       })
       $('table tbody').html(html);
+      updateAjax();
+      deleteAjax();
     })
   }
 

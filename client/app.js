@@ -6,11 +6,15 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var landingRouter = require('./routes/landing');
-var cors = require('cors');
 
 var app = express();
-
-app.use(cors());
+app.use(function (req,res,next) {
+    res.setHeader('Access-Control-Allow-Origin','*');
+    res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers','X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
