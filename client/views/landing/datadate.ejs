@@ -221,19 +221,9 @@
       dataType: "json"
     }).done(function (data) {
       loadData();
-      $('.alert-success').show();
-      $('.alert-success a').after("datadate Added");
-      $('.alert-success a').click(function() {
-          $('.alert-success').hide();
-          $('.alert-success').html('<a href="#" class="close">&times;</a>');
-      })
+      successfulAlertAfterAction("Added");
     }).fail(function (response) {
-      $('.alert-danger').show();
-      $('.alert-danger a').after("datadate cannot be Added : ", response);
-      $('.alert-danger a').click(function() {
-          $('.alert-danger').hide();
-          $('.alert-danger').html('<a href="#" class="close">&times;</a>');
-      })
+      failedAlertAfterAction("Added",response);
     })
   }
 
@@ -248,19 +238,9 @@
       dataType: "json"
     }).done(function (data) {
       loadData();
-      $('.alert-success').show();
-      $('.alert-success a').after("datadate Edited");
-      $('.alert-success a').click(function() {
-          $('.alert-success').hide();
-          $('.alert-success').html('<a href="#" class="close">&times;</a>');
-      })
+      successfulAlertAfterAction("Edited");
     }).fail(function (response) {
-      $('.alert-danger').show();
-      $('.alert-danger a').after("datadate cannot be Edited : ", response);
-      $('.alert-danger a').click(function() {
-          $('.alert-danger').hide();
-          $('.alert-danger').html('<a href="#" class="close">&times;</a>');
-      })
+      failedAlertAfterAction("Edited",response);
     })
   }
 
@@ -271,19 +251,27 @@
       dataType:"json"
     }).done(function (data) {
       loadData();
-      $('.alert-success').show();
-      $('.alert-success a').after("datadate Deleted");
-      $('.alert-success a').click(function() {
-          $('.alert-success').hide();
-          $('.alert-success').html('<a href="#" class="close">&times;</a>');
-      })
+      successfulAlertAfterAction("Deleted");
     }).fail(function (response) {
-      $('.alert-danger').show();
-      $('.alert-danger a').after("datadate cannot be Deleted : ", response);
-      $('.alert-danger a').click(function() {
-          $('.alert-danger').hide();
-          $('.alert-danger').html('<a href="#" class="close">&times;</a>');
-      })
+      failedAlertAfterAction("Deleted",response);
+    })
+  }
+
+  const successfulAlertAfterAction = (action) => {
+    $('.alert-success').show();
+    $('.alert-success').html(`<a href="#" class="close">&times;</a>datadate ${action}`);
+    $('.alert-success a').click(function() {
+        $('.alert-success').hide();
+        $('.alert-success').html('<a href="#" class="close">&times;</a>');
+    })
+  }
+
+  const failedAlertAfterAction = (action,response) => {
+    $('.alert-danger').show();
+    $('.alert-danger').html(`<a href="#" class="close">&times;</a>datadate cannot be ${action} : `, response);
+    $('.alert-danger a').click(function() {
+        $('.alert-danger').hide();
+        $('.alert-danger').html('<a href="#" class="close">&times;</a>');
     })
   }
 
