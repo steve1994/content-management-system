@@ -49,6 +49,20 @@
   <!-- Page Content -->
   <div class="container">
     <div class="form-group row">
+      <div class="form-group col-md-12">
+        <div class="alert alert-success" role="alert" style="display:none;">
+            <a href='#' class="close">&times;</a>
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="form-group col-md-12">
+        <div class="alert alert-danger" role="alert" style="display:none;">
+            <a href='#' class="close">&times;</a>
+        </div>
+      </div>
+    </div>
+    <div class="form-group row">
       <div class="form-group col-md-5">
         <button class="btn btn-primary" id="add">+ add</button>
       </div>
@@ -207,6 +221,19 @@
       dataType: "json"
     }).done(function (data) {
       loadData();
+      $('.alert-success').show();
+      $('.alert-success a').after("datadate Added");
+      $('.alert-success a').click(function() {
+          $('.alert-success').hide();
+          $('.alert-success').html('<a href="#" class="close">&times;</a>');
+      })
+    }).fail(function (response) {
+      $('.alert-danger').show();
+      $('.alert-danger a').after("datadate cannot be Added : ", response);
+      $('.alert-danger a').click(function() {
+          $('.alert-danger').hide();
+          $('.alert-danger').html('<a href="#" class="close">&times;</a>');
+      })
     })
   }
 
@@ -221,6 +248,19 @@
       dataType: "json"
     }).done(function (data) {
       loadData();
+      $('.alert-success').show();
+      $('.alert-success a').after("datadate Edited");
+      $('.alert-success a').click(function() {
+          $('.alert-success').hide();
+          $('.alert-success').html('<a href="#" class="close">&times;</a>');
+      })
+    }).fail(function (response) {
+      $('.alert-danger').show();
+      $('.alert-danger a').after("datadate cannot be Edited : ", response);
+      $('.alert-danger a').click(function() {
+          $('.alert-danger').hide();
+          $('.alert-danger').html('<a href="#" class="close">&times;</a>');
+      })
     })
   }
 
@@ -231,6 +271,19 @@
       dataType:"json"
     }).done(function (data) {
       loadData();
+      $('.alert-success').show();
+      $('.alert-success a').after("datadate Deleted");
+      $('.alert-success a').click(function() {
+          $('.alert-success').hide();
+          $('.alert-success').html('<a href="#" class="close">&times;</a>');
+      })
+    }).fail(function (response) {
+      $('.alert-danger').show();
+      $('.alert-danger a').after("datadate cannot be Deleted : ", response);
+      $('.alert-danger a').click(function() {
+          $('.alert-danger').hide();
+          $('.alert-danger').html('<a href="#" class="close">&times;</a>');
+      })
     })
   }
 
