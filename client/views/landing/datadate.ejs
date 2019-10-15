@@ -38,6 +38,9 @@
           <li class="nav-item">
             <a class="nav-link" href="/landing/map">Maps</a>
           </li>
+          <li class="nav-item">
+            <button id="logout_button" class="btn btn-primary">Logout</button>
+          </li>
         </ul>
       </div>
     </div>
@@ -100,6 +103,7 @@
 
   <script type="text/javascript">
   $(document).ready(function() {
+    authUser();
     $('#add').click(function() {
         $('#hidden_id').val('');
         $('#add_form').show();
@@ -125,6 +129,9 @@
             delete objectSearch['frequency'];
         }
         searchData(objectSearch);
+    })
+    $('#logout_button').click(function() {
+        destroyUser();
     })
   })
 
@@ -259,6 +266,43 @@
       updateAjax();
       deleteAjax();
     })
+  }
+
+  const apiUrlCheck = "http://localhost:3000/api/users/check/";
+  const apiUrlDestroy = "http://localhost:3000/api/users/destroy/"
+  
+  const authUser = () => {
+      let tokenStorage = localStorage.getItem("token");
+      if (tokenStorage) {
+          $.ajax({
+              method:"GET",
+              url: apiUrlCheck,
+              headers: {'Authorization':tokenStorage},
+              dataType: "json"
+          }).done(function(data) {
+              if (!data.valid) {
+                  window.location = '/login';
+              }
+          })
+      } else {
+          window.location = '/login';
+      }
+  }
+
+  const destroyUser = () => {
+      let tokenStorage = localStorage.getItem("token");
+      $.ajax({
+          method:"GET",
+          url: apiUrlDestroy,
+          headers: {'Authorization':tokenStorage},
+          dataType: "json"
+      }).done(function (data) {
+          if (data.logout) {
+              localStorage.removeItem("token");
+              localStorage.removeItem("email");
+              window.location = '/login';
+          }
+      })
   }
 
   </script>

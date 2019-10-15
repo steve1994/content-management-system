@@ -38,6 +38,9 @@
           <li class="nav-item">
             <a class="nav-link" href="/landing/map">Maps</a>
           </li>
+          <li class="nav-item">
+            <button id="logout_button" class="btn btn-primary">Logout</button>
+          </li>
         </ul>
       </div>
     </div>
@@ -47,12 +50,7 @@
   <div class="container">
     <div class="row">
       <div class="col-lg-12 text-center">
-        <h1 class="mt-5">A Bootstrap 4 Starter Template</h1>
-        <p class="lead">Complete with pre-defined file paths and responsive navigation!</p>
-        <ul class="list-unstyled">
-          <li>Bootstrap 4.3.1</li>
-          <li>jQuery 3.4.1</li>
-        </ul>
+        <h1 class="mt-5">Welcome, <div id="email"></div></h1>
       </div>
     </div>
   </div>
@@ -60,6 +58,54 @@
   <!-- Bootstrap core JavaScript -->
   <script src="/vendor/jquery/jquery.slim.min.js"></script>
   <script src="/vendor/bootstrap/js_2/bootstrap.bundle.min.js"></script>
+  <script src="/javascripts/jquery-3.4.1.min.js"></script>
+
+  <script type="text/javascript">
+      $(document).ready(function() {
+          authUser();
+          $('#email').text(localStorage.getItem("email"));
+          $('#logout_button').click(function() {
+              destroyUser();
+          })
+      })
+
+      const apiUrlCheck = "http://localhost:3000/api/users/check/";
+      const apiUrlDestroy = "http://localhost:3000/api/users/destroy/";
+
+      const authUser = () => {
+          let tokenStorage = localStorage.getItem("token");
+          if (tokenStorage) {
+              $.ajax({
+                  method:"GET",
+                  url: apiUrlCheck,
+                  headers: {'Authorization':tokenStorage},
+                  dataType: "json"
+              }).done(function(data) {
+                  if (!data.valid) {
+                      window.location = '/login';
+                  }
+              })
+          } else {
+              window.location = '/login';
+          }
+      }
+
+      const destroyUser = () => {
+          let tokenStorage = localStorage.getItem("token");
+          $.ajax({
+              method:"GET",
+              url: apiUrlDestroy,
+              headers: {'Authorization':tokenStorage},
+              dataType: "json"
+          }).done(function (data) {
+              if (data.logout) {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("email");
+                  window.location = '/login';
+              }
+          })
+      }
+  </script>
 
 </body>
 
