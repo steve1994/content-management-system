@@ -32,7 +32,7 @@
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-50">
-				<form class="login100-form validate-form">
+				<form class="login100-form validate-form" id="register_form">
 					<span class="login100-form-title p-b-33">
 						Content Management System
 					</span>
@@ -75,7 +75,56 @@
 		</div>
 	</div>
 
+	<script src="/javascripts/jquery-3.4.1.min.js"></script>
 
+	<script type="text/javascript">
+			$(document).ready(function() {
+					authUser();
+					$('#register_form').submit(function (event) {
+							event.preventDefault();
+							registerFunction();
+					})
+			})
+
+			const apiUrlRegister = "http://localhost:3000/api/users/register/";
+			const apiUrlCheck = "http://localhost:3000/api/users/check/";
+
+			const registerFunction = () => {
+					$.ajax({
+							method: "POST",
+							url: apiUrlRegister,
+							data: {email:$('#email').val(),
+										 password:$('#password').val(),
+									 	 retypepassword:$('#retype_password').val()},
+							dataType: "json"
+					}).done(function(data) {
+							if (data.token) {
+									localStorage.setItem("token",data.token);
+									localStorage.setItem("email",data.data.email);
+									window.location = '/landing';
+							}
+					}).fail(function (response) {
+							alert("Email and/or password is not correct or already been used");
+					})
+			}
+
+			const authUser = () => {
+					let tokenStorage = localStorage.getItem("token");
+					if (tokenStorage) {
+							$.ajax({
+									method:"GET",
+									url: apiUrlCheck,
+									headers: {'Authorization':tokenStorage},
+									dataType: "json"
+							}).done(function(data) {
+									if (data.valid) {
+											window.location = '/landing';
+									}
+							})
+					}
+			}
+
+	</script>
 
 <!--===============================================================================================-->
 	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
