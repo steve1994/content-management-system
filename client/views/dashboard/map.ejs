@@ -134,13 +134,13 @@
 					for (let i=0;i<data.length;i++) {
 							let lonLat = new OpenLayers.LonLat( data[i].lng , data[i].lat )
 									.transform(
-										new OpenLayers.Projection(data[i].title),
+										new OpenLayers.Projection('EPSG:4326'),
 										map.getProjectionObject()
 							);
 							arrayLonlat.push(lonLat);
 					}
 
-					var zoom=16;
+					var zoom=5;
 
 					var markers = new OpenLayers.Layer.Markers("Markers");
 					map.addLayer(markers);
